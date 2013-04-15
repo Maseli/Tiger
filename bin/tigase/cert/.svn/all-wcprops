@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/reps/tigase-utils/!svn/ver/644/trunk/src/main/java/tigase/cert
+END
+RSAPrivateKeyDecoder.java
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/reps/tigase-utils/!svn/ver/644/trunk/src/main/java/tigase/cert/RSAPrivateKeyDecoder.java
+END
+CertificateUtil.java
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/reps/tigase-utils/!svn/ver/644/trunk/src/main/java/tigase/cert/CertificateUtil.java
+END
+CertificateEntry.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/reps/tigase-utils/!svn/ver/644/trunk/src/main/java/tigase/cert/CertificateEntry.java
+END
+CertCheckResult.java
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/reps/tigase-utils/!svn/ver/644/trunk/src/main/java/tigase/cert/CertCheckResult.java
+END

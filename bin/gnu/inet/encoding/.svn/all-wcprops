@@ -1,0 +1,77 @@
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/reps/tigase-utils/!svn/ver/560/trunk/src/main/java/gnu/inet/encoding
+END
+NFKC.java
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/reps/tigase-utils/!svn/ver/560/trunk/src/main/java/gnu/inet/encoding/NFKC.java
+END
+Composition.java
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/reps/tigase-utils/!svn/ver/560/trunk/src/main/java/gnu/inet/encoding/Composition.java
+END
+PunycodeException.java
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/reps/tigase-utils/!svn/ver/560/trunk/src/main/java/gnu/inet/encoding/PunycodeException.java
+END
+Punycode.java
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/reps/tigase-utils/!svn/ver/560/trunk/src/main/java/gnu/inet/encoding/Punycode.java
+END
+DecompositionKeys.java
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/reps/tigase-utils/!svn/ver/560/trunk/src/main/java/gnu/inet/encoding/DecompositionKeys.java
+END
+IDNAException.java
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/reps/tigase-utils/!svn/ver/560/trunk/src/main/java/gnu/inet/encoding/IDNAException.java
+END
+RFC3454.java
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/reps/tigase-utils/!svn/ver/560/trunk/src/main/java/gnu/inet/encoding/RFC3454.java
+END
+CombiningClass.java
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/reps/tigase-utils/!svn/ver/560/trunk/src/main/java/gnu/inet/encoding/CombiningClass.java
+END
+DecompositionMappings.java
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/reps/tigase-utils/!svn/ver/560/trunk/src/main/java/gnu/inet/encoding/DecompositionMappings.java
+END
+IDNA.java
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/reps/tigase-utils/!svn/ver/560/trunk/src/main/java/gnu/inet/encoding/IDNA.java
+END
+StringprepException.java
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/reps/tigase-utils/!svn/ver/560/trunk/src/main/java/gnu/inet/encoding/StringprepException.java
+END
+Stringprep.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/reps/tigase-utils/!svn/ver/560/trunk/src/main/java/gnu/inet/encoding/Stringprep.java
+END

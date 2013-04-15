@@ -1,0 +1,143 @@
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/reps/tigase-utils/!svn/ver/644/trunk/src/main/java/tigase/util
+END
+ZLibWrapper.java
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/reps/tigase-utils/!svn/ver/644/trunk/src/main/java/tigase/util/ZLibWrapper.java
+END
+SizedCache.java
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/reps/tigase-utils/!svn/ver/644/trunk/src/main/java/tigase/util/SizedCache.java
+END
+ClassUtil.java
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/reps/tigase-utils/!svn/ver/644/trunk/src/main/java/tigase/util/ClassUtil.java
+END
+PasswordHash.java
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/reps/tigase-utils/!svn/ver/644/trunk/src/main/java/tigase/util/PasswordHash.java
+END
+DNSResolver.java
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/reps/tigase-utils/!svn/ver/644/trunk/src/main/java/tigase/util/DNSResolver.java
+END
+DNSEntry.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/reps/tigase-utils/!svn/ver/644/trunk/src/main/java/tigase/util/DNSEntry.java
+END
+VMPCRandom.java
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/reps/tigase-utils/!svn/ver/644/trunk/src/main/java/tigase/util/VMPCRandom.java
+END
+TigaseStringprepException.java
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/reps/tigase-utils/!svn/ver/644/trunk/src/main/java/tigase/util/TigaseStringprepException.java
+END
+Algorithms.java
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/reps/tigase-utils/!svn/ver/644/trunk/src/main/java/tigase/util/Algorithms.java
+END
+XMPPStringPrepSimple.java
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/reps/tigase-utils/!svn/ver/644/trunk/src/main/java/tigase/util/XMPPStringPrepSimple.java
+END
+SimpleCache.java
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/reps/tigase-utils/!svn/ver/644/trunk/src/main/java/tigase/util/SimpleCache.java
+END
+DateTimeFormatter.java
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/reps/tigase-utils/!svn/ver/644/trunk/src/main/java/tigase/util/DateTimeFormatter.java
+END
+XMPPStringPrepEmpty.java
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/reps/tigase-utils/!svn/ver/644/trunk/src/main/java/tigase/util/XMPPStringPrepEmpty.java
+END
+Base64.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/reps/tigase-utils/!svn/ver/644/trunk/src/main/java/tigase/util/Base64.java
+END
+XMPPStringPrepIfc.java
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/reps/tigase-utils/!svn/ver/644/trunk/src/main/java/tigase/util/XMPPStringPrepIfc.java
+END
+XMPPStringPrepLibIDN.java
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/reps/tigase-utils/!svn/ver/644/trunk/src/main/java/tigase/util/XMPPStringPrepLibIDN.java
+END
+JDBCAbstract.java
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/reps/tigase-utils/!svn/ver/644/trunk/src/main/java/tigase/util/JDBCAbstract.java
+END
+JIDUtils.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/reps/tigase-utils/!svn/ver/644/trunk/src/main/java/tigase/util/JIDUtils.java
+END
+CacheObject.java
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/reps/tigase-utils/!svn/ver/644/trunk/src/main/java/tigase/util/CacheObject.java
+END
+XMPPStringPrepFactory.java
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/reps/tigase-utils/!svn/ver/644/trunk/src/main/java/tigase/util/XMPPStringPrepFactory.java
+END
+Telnet.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/reps/tigase-utils/!svn/ver/644/trunk/src/main/java/tigase/util/Telnet.java
+END
+ClassComparator.java
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/reps/tigase-utils/!svn/ver/644/trunk/src/main/java/tigase/util/ClassComparator.java
+END
+ObjectComparator.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/reps/tigase-utils/!svn/ver/644/trunk/src/main/java/tigase/util/ObjectComparator.java
+END
