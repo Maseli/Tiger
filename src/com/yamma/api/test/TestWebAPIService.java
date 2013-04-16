@@ -6,6 +6,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+//~--- non-JDK imports --------------------------------------------------------
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -15,13 +19,38 @@ import org.apache.http.client.methods.HttpUriRequest;
 
 import org.apache.http.impl.client.DefaultHttpClient;
 
-public class TestWebAPIService {
+public class TestWebAPIService extends Thread {
 	
 	private static final int limit = 100;
+	private static final int number = 100;
+	
+	private static Map<String, Integer> result = new ConcurrentHashMap<String,Integer>();
 	
 	public static void main(String[] args) {
-
-		Map<String, Integer> result = new HashMap<String, Integer>();
+		new TestWebAPIService().start();
+		new TestWebAPIService().start();		
+		new TestWebAPIService().start();
+		new TestWebAPIService().start();
+		new TestWebAPIService().start();
+		new TestWebAPIService().start();		
+		new TestWebAPIService().start();
+		new TestWebAPIService().start();
+		new TestWebAPIService().start();
+		new TestWebAPIService().start();		
+		new TestWebAPIService().start();
+		new TestWebAPIService().start();		
+		new TestWebAPIService().start();
+		new TestWebAPIService().start();
+		new TestWebAPIService().start();
+		new TestWebAPIService().start();		
+		new TestWebAPIService().start();
+		new TestWebAPIService().start();
+		new TestWebAPIService().start();
+		new TestWebAPIService().start();
+	}
+	
+	@Override
+	public void run() {
 		
 		int i = 0;
 		Date start = new Date();
@@ -31,8 +60,8 @@ public class TestWebAPIService {
 		while (true) {
 			// 核心应用类
 			HttpClient httpClient = new DefaultHttpClient();
-			String receiver = "yamma"+(Math.abs((random.nextInt()%10))+1);
-			result.put(receiver, (result.get(receiver)!=null)?result.get(receiver):0+1);
+			String receiver = "yamma"+(Math.abs((random.nextInt()%number))+1);
+			result.put(receiver, ((result.get(receiver)!=null)?result.get(receiver):0)+1);
 			// HTTP请求
 			HttpUriRequest request = new HttpGet(
 					"http://192.168.0.55:8080/sn/?receiver="+receiver+"&notify="+sdf.format(new Date())+"%20%20yamma");
@@ -54,7 +83,7 @@ public class TestWebAPIService {
 			}
 		}
 		
-		for(int t=1;t<=10;t++) {
+		for(int t=1;t<=number;t++) {
 			HttpClient httpClient = new DefaultHttpClient();
 			HttpUriRequest request = new HttpGet(
 					"http://192.168.0.55:8080/sn/?receiver=yamma"+t+"&notify="+"end!");

@@ -136,34 +136,43 @@ public abstract class SessionManagerConfig {
 	public static void getDefaults(Map<String, Object> props, Map<String, Object> params) {
 		props.put(ADMIN_SCRIPTS_PROP_KEY, ADMIN_SCRIPTS_PROP_VAL);
 
+		// 这里获取full_comps即是否全部加载,--auth-db目前在init.properties中没有配置
 		boolean full_comps = (params.get(GEN_AUTH_DB) == null)
 			|| params.get(GEN_AUTH_DB).toString().equals("mysql")
 			|| params.get(GEN_AUTH_DB).toString().equals("pgsql")
 			|| params.get(GEN_AUTH_DB).toString().equals("derby")
 			|| params.get(GEN_AUTH_DB).toString().equals("tigase-auth");
+		
+		// 创建一个集合,存储所有的plugin
 		LinkedHashSet<String> plugins = new LinkedHashSet<String>(32);
 
+		// --test为测试模式,只加载固定的plugin
 		if ((Boolean) params.get(GEN_TEST)) {
 			Collections.addAll(plugins, PLUGINS_TEST_PROP_VAL);
 		} else {
+			// 不是测试模式,判断是否加载全部的plugin
 			if (full_comps) {
-
+				// 加载所有plugin
 				// Some plugins are not loaded during tests at least until proper
 				// test cases are created for them. Sample case is off-line message
 				// storage which may impact some test cases.
 				Collections.addAll(plugins, PLUGINS_FULL_PROP_VAL);
 			} else {
+				// 这个没有jabber:iq:register这个plugin
 				Collections.addAll(plugins, PLUGINS_NO_REG_PROP_VAL);
 			}
 		}
 
+		// 加载init.properties的--sm-plugins这个key的值,这是所有plugin的配置
 		String str_plugins = (String) params.get(GEN_SM_PLUGINS);
+		// 用户写+号的值使用一个字符串存储在prop配置中
 		String plugin_concurrency = "";
-
+		// 如果配置了plugin,根据配置增删目前加载的plugins集合
 		if (str_plugins != null) {
 			String[] conf_plugins = str_plugins.split(",");
-
+			
 			for (String plugin : conf_plugins) {
+				// 根据每个plugin配置时第一位的符号判断动作
 				switch (plugin.charAt(0)) {
 					case '+' :
 						if (addPlugin(plugins, plugin.substring(1))) {
@@ -193,9 +202,11 @@ public abstract class SessionManagerConfig {
 		props.put(SKIP_PRIVACY_PROP_KEY, (skip_privacy != null) && skip_privacy.equals("true"));
 
 		if (params.get(GEN_VIRT_HOSTS) != null) {
+			// 如果配置了vir-host,使用虚拟域名(由于内网使用,所以这个已经配置了虚拟的)
 			HOSTNAMES_PROP_VAL = ((String) params.get(GEN_VIRT_HOSTS)).split(",");
 			ANONYMOUS_DOMAINS_PROP_VAL = ((String) params.get(GEN_VIRT_HOSTS)).split(",");
 		} else {
+			// 如果没有配置vir-host,获取真实域名(跟DNS解析有关)
 			HOSTNAMES_PROP_VAL = DNSResolver.getDefHostNames();
 			ANONYMOUS_DOMAINS_PROP_VAL = DNSResolver.getDefHostNames();
 		}

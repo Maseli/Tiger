@@ -615,14 +615,6 @@ public abstract class ConfiguratorAbstract extends
 		}
 
 		String property_filenames = (String) initProperties.get(PROPERTY_FILENAME_PROP_KEY);
-
-		File file = new File("Yammatest.txt");
-		try {
-			file.createNewFile();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
 		
 		if (property_filenames != null) {
 			String[] prop_files = property_filenames.split(",");
