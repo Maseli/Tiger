@@ -36,6 +36,7 @@ import java.nio.channels.SocketChannel;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
@@ -193,6 +194,8 @@ public class ConnectionOpenThread implements Runnable {
 				// 获取当前可以处理的keys,也就是准备好了的Channel(通过SelectionKey的channel方法)
 				selector.select();
 
+				Set<SelectionKey> keys = selector.selectedKeys();
+				
 				// Set<SelectionKey> selected_keys = selector.selectedKeys();
 				// for (SelectionKey sk : selected_keys) {
 				for (Iterator i = selector.selectedKeys().iterator(); i.hasNext(); ) {
@@ -239,6 +242,9 @@ public class ConnectionOpenThread implements Runnable {
 					}    // end of if (sk.readyOps() & SelectionKey.OP_ACCEPT)
 
 					if ((sk.readyOps() & SelectionKey.OP_CONNECT) != 0) {
+						
+						System.out.println("ConnectionOpenThread.run(): will connect to Cluster............................");
+						
 						sk.cancel();
 						sc = (SocketChannel) sk.channel();
 
@@ -327,6 +333,7 @@ public class ConnectionOpenThread implements Runnable {
 	}
 
 	private void addISA(InetSocketAddress isa, ConnectionOpenListener al) throws IOException {
+		System.out.println("addISA is running..................");
 		switch (al.getConnectionType()) {
 			case accept :
 				long port_throttling = getThrottlingForPort(isa.getPort());
@@ -349,11 +356,15 @@ public class ConnectionOpenThread implements Runnable {
 				ssc.socket().setReceiveBufferSize(al.getReceiveBufferSize());
 				ssc.configureBlocking(false);
 				ssc.socket().bind(isa);
+				// 注册到ServerSocketChannel,将tigase.net.ConnectionOpenListener实例作为attachment
+				// ConnectionOpenListener是处理网络数据的实例,即accept方法
 				ssc.register(selector, SelectionKey.OP_ACCEPT, al);
 
 				break;
 
 			case connect :
+				System.out.println("ConnectionOpenThread:360 addTask connect to Host："+isa.getAddress()+":"+isa.getPort());
+				
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "Setting up ''connect'' channel for: {0}/{1}",
 							new Object[] { isa.getAddress(),
@@ -366,6 +377,8 @@ public class ConnectionOpenThread implements Runnable {
 				sc.socket().setTrafficClass(al.getTrafficClass());
 				sc.configureBlocking(false);
 				sc.connect(isa);
+				// 注册到ServerSocketChannel,将tigase.net.ConnectionOpenListener实例作为attachment
+				// ConnectionOpenListener是处理网络数据的实例,即accept方法
 				sc.register(selector, SelectionKey.OP_CONNECT, al);
 
 				break;

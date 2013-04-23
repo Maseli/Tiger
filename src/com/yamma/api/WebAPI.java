@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,23 +35,27 @@ public class WebAPI extends AbstractHandler
         baseRequest.setHandled(true);
         if(this.path.equals("sendNotify")) {
         		response.setStatus(HttpServletResponse.SC_OK);
-        		request.setCharacterEncoding("UTF8");
+//        		request.setCharacterEncoding("UTF-8");
         		String notify = request.getParameter("notify");
         		String receiver = request.getParameter("receiver");
-        		
+        		if(notify == null || "".equals(notify) 
+        				|| receiver == null || "".equals(receiver)) {
+        			response.getWriter().print("false");
+        			return;
+        		}
         		System.out.println("Notify is "+notify+" and receiver is "+receiver);
         		TestAPI.sendMessage(receiver, "admin", "Test", notify, "test");
-        		response.getWriter().println("<h1>Hello World</h1>");
+        		response.getWriter().print("true");
         } else {
         		response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
     }
 
     public static void startWebAPIService() throws Exception {
-        Server server = new Server(8080);
+        Server server = new Server(6666);
         // path:/sn
         ContextHandler sendNotifyHandler = new ContextHandler();
-        sendNotifyHandler.setContextPath("/sn");
+        sendNotifyHandler.setContextPath("/pushMsg");
         sendNotifyHandler.setHandler(new WebAPI("sendNotify"));
         // path:/gi
         ContextHandler getInfoHandler = new ContextHandler();
@@ -65,5 +70,9 @@ public class WebAPI extends AbstractHandler
         
         System.out.println("WebAPI已经启动!");
     }
+    
+    public static void main(String[] args) throws Exception {
+		startWebAPIService();
+	}
     
 }

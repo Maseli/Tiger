@@ -616,13 +616,19 @@ public abstract class ConfiguratorAbstract extends
 
 		String property_filenames = (String) initProperties.get(PROPERTY_FILENAME_PROP_KEY);
 		
+		try {
+			new File("etc/init.properties").createNewFile();
+		} catch (IOException e1) {
+			System.out.println("创建测试文件失败!");
+			e1.printStackTrace();
+		}
+		
 		if (property_filenames != null) {
 			String[] prop_files = property_filenames.split(",");
 
 			for (String property_filename : prop_files) {
 				log.log(Level.CONFIG, "Loading initial properties from property file: {0}",
 						property_filename);
-
 				try {
 					Properties defProps = new Properties();
 					

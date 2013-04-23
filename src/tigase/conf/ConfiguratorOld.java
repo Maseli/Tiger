@@ -662,51 +662,51 @@ public class ConfiguratorOld extends ConfiguratorAbstract {
 	 * @param args a <code>String[]</code> value
 	 * @throws Exception
 	 */
-	public static void main(final String[] args) throws Exception {
-
-		force = false;
-
-		if (args != null && args.length > 0) {
-      for (int i = 0; i < args.length; i++) {
-        if (args[i].equals("-h")) {
-          System.out.print(help());
-          System.exit(0);
-        } // end of if (args[i].equals("-h"))
-        if (args[i].equals("-key")) {
-					key = args[++i];
-        } // end of if (args[i].equals("-h"))
-        if (args[i].equals("-value")) {
-					value = args[++i];
-        } // end of if (args[i].equals("-h"))
-        if (args[i].equals("-set")) {
-					set = true;
-        } // end of if (args[i].equals("-h"))
-        if (args[i].equals("-add")) {
-					add = true;
-        } // end of if (args[i].equals("-h"))
-        if (args[i].equals("-print")) {
-					print = true;
-        } // end of if (args[i].equals("-h"))
-        if (args[i].equals("-f")) {
-					force = true;
-        } // end of if (args[i].equals("-h"))
-      } // end of for (int i = 0; i < args.length; i++)
-		}
-
-		ConfiguratorOld conf = new ConfiguratorOld();
-		conf.init(args);
-
-		if (set || add) {
-			conf.setValue(key, value, add, true, null);
-		} // end of if (set)
-
-		if (print) {
-			Map<String, Object> allprop = conf.getAllProperties(key);
-			for (Map.Entry<String, Object> entry: allprop.entrySet()) {
-				print(entry.getKey(), entry.getValue());
-			} // end of for (Map.Entry entry: prop.entrySet())
-		} // end of if (print)
-	}
+//	public static void main(final String[] args) throws Exception {
+//
+//		force = false;
+//
+//		if (args != null && args.length > 0) {
+//      for (int i = 0; i < args.length; i++) {
+//        if (args[i].equals("-h")) {
+//          System.out.print(help());
+//          System.exit(0);
+//        } // end of if (args[i].equals("-h"))
+//        if (args[i].equals("-key")) {
+//					key = args[++i];
+//        } // end of if (args[i].equals("-h"))
+//        if (args[i].equals("-value")) {
+//					value = args[++i];
+//        } // end of if (args[i].equals("-h"))
+//        if (args[i].equals("-set")) {
+//					set = true;
+//        } // end of if (args[i].equals("-h"))
+//        if (args[i].equals("-add")) {
+//					add = true;
+//        } // end of if (args[i].equals("-h"))
+//        if (args[i].equals("-print")) {
+//					print = true;
+//        } // end of if (args[i].equals("-h"))
+//        if (args[i].equals("-f")) {
+//					force = true;
+//        } // end of if (args[i].equals("-h"))
+//      } // end of for (int i = 0; i < args.length; i++)
+//		}
+//
+//		ConfiguratorOld conf = new ConfiguratorOld();
+//		conf.init(args);
+//
+//		if (set || add) {
+//			conf.setValue(key, value, add, true, null);
+//		} // end of if (set)
+//
+//		if (print) {
+//			Map<String, Object> allprop = conf.getAllProperties(key);
+//			for (Map.Entry<String, Object> entry: allprop.entrySet()) {
+//				print(entry.getKey(), entry.getValue());
+//			} // end of for (Map.Entry entry: prop.entrySet())
+//		} // end of if (print)
+//	}
 
 	@Override
 	public void processPacket(final Packet packet, final Queue<Packet> results) {

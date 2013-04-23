@@ -68,27 +68,34 @@ import java.util.logging.Logger;
 			+ "compatibility should be performed.")
 public class ProcessorFactory {
 	private static final Logger log = Logger.getLogger(ProcessorFactory.class.getName());
+	/** 存储所有的plugin的实例,按照子类在静态初始化块中推测的 */
 	private static final Map<String, XMPPImplIfc> processors = new TreeMap<String, XMPPImplIfc>();
 
 	//~--- static initializers --------------------------------------------------
 
 	static {
 		try {
+			// 在这个类加载时,获取所有XMPPImplIfc类的子类
 			Set<Class<XMPPImplIfc>> procs = ClassUtil.getClassesImplementing(XMPPImplIfc.class);
 			ArrayList<String> elems = new ArrayList<String>(32);
 
+			// 迭代子类,找到plugin对应的类的实例
 			for (Class<XMPPImplIfc> cproc : procs) {
 				if ( !Modifier.isPublic(cproc.getModifiers())) {
 					continue;
 				}
 
 				XMPPImplIfc xproc = cproc.newInstance();
-
+				
+				// 以plugin的ID为key,将所有plugin存储在processors这个集合中
 				processors.put(xproc.id(), xproc);
 
+				// 获得实现类中的ELEMENTS
 				String[] els = xproc.supElements();
+				// 获得实现类中的XMLNSS
 				String[] nss = xproc.supNamespaces();
-
+				
+				// 通过ELEMENTS和XMLNSS拼整个标签
 				if ((els != null) && (nss != null)) {
 					for (int i = 0; i < els.length; i++) {
 						elems.add("  <" + els[i] + " xmlns='" + nss[i] + "'/>\n");
@@ -96,6 +103,7 @@ public class ProcessorFactory {
 				}      // end of if (nss != null)
 			}        // end of for ()
 
+			// 排序标签并进行打印
 			Collections.sort(elems);
 
 			if (log.isLoggable(Level.FINEST)) {
@@ -122,7 +130,7 @@ public class ProcessorFactory {
 	//~--- get methods ----------------------------------------------------------
 
 	/**
-	 * Method description
+	 * 加载Filter,Filter会在SessionManager发送消息之前执行
 	 *
 	 *
 	 * @param id
@@ -140,7 +148,8 @@ public class ProcessorFactory {
 	}
 
 	/**
-	 * Method description
+	 * 获取plugin执行后执行的processor,目前看只有OfflineMessages一个
+	 * 这个很有AOP的思想,就是interceptor的意思
 	 *
 	 *
 	 * @param id
@@ -158,8 +167,8 @@ public class ProcessorFactory {
 	}
 
 	/**
-	 * Method description
-	 *
+	 * 获取plugin执行前执行的Processor的实例
+	 * 这个很有AOP的思想,就是interceptor的意思
 	 *
 	 * @param id
 	 *
@@ -176,7 +185,7 @@ public class ProcessorFactory {
 	}
 
 	/**
-	 * Method description
+	 * 根据plugin的id获取Plugin的实例
 	 *
 	 *
 	 * @param id

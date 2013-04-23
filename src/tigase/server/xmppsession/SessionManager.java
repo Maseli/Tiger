@@ -155,6 +155,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 			new ConcurrentHashMap<BareJID, XMPPSession>(100000);
 	private Map<String, ProcessingThreads<ProcessorWorkerThread>> workerThreads =
 			new ConcurrentHashMap<String, ProcessingThreads<ProcessorWorkerThread>>(32);
+	/** 存储配置中使用的所有plugin的实例 */
 	private Map<String, XMPPProcessorIfc> processors =
 			new ConcurrentHashMap<String, XMPPProcessorIfc>(32);
 	private Map<String, XMPPPreprocessorIfc> preProcessors =
@@ -723,11 +724,13 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 		LinkedHashMap<String, Integer> plugins_concurrency =
 				new LinkedHashMap<String, Integer>(20);
+		// 使用默认配置的时候,这个plugins_conc应该为一个空数组
 		String[] plugins_conc = ((String) props.get(PLUGINS_CONCURRENCY_PROP_KEY)).split(",");
-
+		
 		log.log(Level.CONFIG, "Loading concurrency plugins list: {0}",
 				Arrays.toString(plugins_conc));
 
+		// 默认配置的plugin都没有=号,这段略过------------>
 		if ((plugins_conc != null) && (plugins_conc.length > 0)) {
 			for (String plugc : plugins_conc) {
 				log.log(Level.CONFIG, "Loading: {0}", plugc);
@@ -748,10 +751,13 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 				}
 			}
 		}
-
+		//<------------略过结束
+		
 		try {
+			// 这个参默认为"default",看起来线程池的值应该是100
 			String sm_threads_pool = (String) props.get(SM_THREADS_POOL_PROP_KEY);
 
+			// 使用默认的配置,也就是不配置sm-threads-pool参的话这个略过----------------->
 			if (!sm_threads_pool.equals(SM_THREADS_POOL_PROP_VAL)) {
 				String[] threads_pool_params = sm_threads_pool.split(":");
 				int def_pool_size = 100;
@@ -766,7 +772,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 						def_pool_size = 100;
 					}
 				}
-
+				
 				ProcessorWorkerThread worker = new ProcessorWorkerThread();
 				ProcessingThreads<ProcessorWorkerThread> pt =
 						new ProcessingThreads<ProcessorWorkerThread>(worker, def_pool_size,
@@ -775,17 +781,21 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 				workerThreads.put(defPluginsThreadsPool, pt);
 				log.log(Level.CONFIG, "Created a default thread pool: {0}", def_pool_size);
 			}
+			//<------------------略过结束
 
 			String[] plugins = (String[]) props.get(PLUGINS_PROP_KEY);
 
 			log.log(Level.CONFIG, "Loaded plugins list: {0}", Arrays.toString(plugins));
 
 			// maxPluginsNo = plugins.length;
+			// 先清空SessionManager的processors成员,注意要分清ProcessorFactory.processor(存储所有plugin实例的)成员
 			processors.clear();
 
+			// 迭代所有的plugin的名称数组,将对应实例添加到实例变量引用的集合中
 			for (String plug_id : plugins) {
 				log.log(Level.CONFIG, "Loading and configuring plugin: {0}", plug_id);
 
+				// 将plugin添加到对应集合(集合分类很多,主要看这个plugin实现了哪些接口,多数为普通Processor)
 				XMPPImplIfc plugin = addPlugin(plug_id, plugins_concurrency.get(plug_id));
 				if (plugin != null) {
 
@@ -804,6 +814,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 					} catch (TigaseDBException ex) {
 						log.log(Level.SEVERE, "Problem initializing plugin: " + plugin.id(), ex);
 					}
+					// 这个allPlugins与processor不同,没有key作为索引
 					allPlugins.add(plugin);
 				}
 			} // end of for (String comp_id: plugins)
@@ -1737,6 +1748,15 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 		}
 	}
 
+	/**
+	 * 将插件的实例添加到SessionManager的processor集合中
+	 * @param plug_id
+	 * @param conc 如果没有配置带=号的plugin,这个值应该为null
+	 * @return
+	 * @throws ClassNotFoundException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 */
 	private XMPPImplIfc addPlugin(String plug_id, Integer conc)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 		XMPPImplIfc result = null;
@@ -1762,8 +1782,9 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 		}
 
 		boolean loaded = false;
-
+		
 		if (proc != null) {
+			// 这个条件表达式中没必要再判断proc是否为null,当没有=号配置按实现类要求的数目(concurrentQueuesNo方法)定
 			int concurrency =
 					((conc != null) ? conc : ((proc != null) ? proc.concurrentQueuesNo() : 0));
 
@@ -1772,6 +1793,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 			// If there is not default processors thread pool or the processor does
 			// have thread pool specific settings create a separate thread pool
 			// for the processor
+			// 如果没有配置总的defPluginsThreadsPool这个池,就专为每个plugin初始化一个池
 			if ((workerThreads.get(defPluginsThreadsPool) == null) || (conc != null)) {
 				ProcessorWorkerThread worker = new ProcessorWorkerThread();
 				ProcessingThreads<ProcessorWorkerThread> pt =
@@ -1790,6 +1812,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 			result = proc;
 		}
 
+		// 获取PreProcessor,就是为了执行preProcess方法
+		// 这个很有AOP的思想,初步判断应该是在每次处理之前都要调用
 		XMPPPreprocessorIfc preproc = ProcessorFactory.getPreprocessor(plug_id);
 
 		if (preproc != null) {
@@ -1800,6 +1824,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 			result = preproc;
 		}
 
+		// 获取PostProcessor,就是为了执行postProcess方法
+		// 这个很有AOP的思想,就是interceptor的意思
 		XMPPPostprocessorIfc postproc = ProcessorFactory.getPostprocessor(plug_id);
 
 		if (postproc != null) {
@@ -1810,6 +1836,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 			result = postproc;
 		}
 
+		//TODO 这个还不知道在哪个生命周期执行
 		XMPPStopListenerIfc stoplist = ProcessorFactory.getStopListener(plug_id);
 
 		if (stoplist != null) {
@@ -1820,9 +1847,11 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 			result = stoplist;
 		}
 
+		// 添加Packet的Filter,在每次发送消息之前执行过滤
 		XMPPPacketFilterIfc filterproc = ProcessorFactory.getPacketFilter(plug_id);
 
 		if (filterproc != null) {
+			// outFilter是一个过滤器的集合,在addOutPacket方法中迭代执行
 			outFilters.put(plug_id, filterproc);
 			log.log(Level.CONFIG, "Added packet filter: {0} for plugin id: {1}", new Object[] {
 					filterproc.getClass().getSimpleName(), plug_id });
@@ -1851,6 +1880,12 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 		return results;
 	}
 
+	/**
+	 * 根据plug的id获取配置,通过plug写在配置文件中的名字以/分隔后获得
+	 * @param plug_id
+	 * @param props
+	 * @return
+	 */
 	private Map<String, Object>
 			getPluginSettings(String plug_id, Map<String, Object> props) {
 		Map<String, Object> plugin_settings = new ConcurrentHashMap<String, Object>(10);

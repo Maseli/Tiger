@@ -172,10 +172,11 @@ public abstract class SessionManagerConfig {
 			String[] conf_plugins = str_plugins.split(",");
 			
 			for (String plugin : conf_plugins) {
-				// 根据每个plugin配置时第一位的符号判断动作
+				// 根据每个plugin配置时第一位的符号判断动作,默认配置文件中没有使用+的
 				switch (plugin.charAt(0)) {
 					case '+' :
 						if (addPlugin(plugins, plugin.substring(1))) {
+							// 如果这个plugin的配置中含有等号,则将这个配置添加到plugin_concurrency字符串中
 							plugin_concurrency += plugin.substring(1) + ",";
 						}
 
@@ -195,6 +196,7 @@ public abstract class SessionManagerConfig {
 		}
 
 		props.put(PLUGINS_PROP_KEY, plugins.toArray(new String[plugins.size()]));
+		// 这个KEY会在SessionManager的setProperties方法中取值
 		props.put(PLUGINS_CONCURRENCY_PROP_KEY, plugin_concurrency);
 
 		String skip_privacy = (String) params.get("--" + SKIP_PRIVACY_PROP_KEY);
@@ -227,7 +229,7 @@ public abstract class SessionManagerConfig {
 			TRUSTED_PROP_VAL = ((String) params.get(GEN_TRUSTED)).split(",");
 		} else {
 			TRUSTED_PROP_VAL = new String[HOSTNAMES_PROP_VAL.length];
-
+			// 设置管理员为白名单成员,拼域名
 			for (int i = 0; i < TRUSTED_PROP_VAL.length; i++) {
 				TRUSTED_PROP_VAL[i] = "admin@" + HOSTNAMES_PROP_VAL[i];
 			}    // end of for (int i = 0; i < TRUSTED_PROP_VAL.length; i++)
@@ -247,6 +249,12 @@ public abstract class SessionManagerConfig {
 
 	//~--- methods --------------------------------------------------------------
 
+	/**
+	 * 将plugin添加到传入的plugins集合中,如果这个plugin的配置中含有‘=’号则返回ture
+	 * @param plugins
+	 * @param plugin
+	 * @return
+	 */
 	private static boolean addPlugin(LinkedHashSet<String> plugins, String plugin) {
 		String[] pla = plugin.split("=");
 

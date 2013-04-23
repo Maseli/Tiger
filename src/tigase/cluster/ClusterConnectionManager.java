@@ -206,11 +206,14 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		if (params.get(CLUSTER_NODES) != null) {
 			String[] cl_nodes = ((String) params.get(CLUSTER_NODES)).split(",");
 
+			// 分析配置后对集群节点列表重新赋值
 			for (int i = 0; i < cl_nodes.length; i++) {
+				// 从配置的域名中智能的分析出domain,通过/和@两个符号的判断(目测直接写ip,或者主机名是没问题的)
 				cl_nodes[i] = BareJID.parseJID(cl_nodes[i])[1];
 			}
 
 			nodesNo = cl_nodes.length;
+			// 将所有集群节点存储在配置Map中
 			props.put(CLUSTER_NODES_PROP_KEY, cl_nodes);
 		} else {
 			props.put(CLUSTER_NODES_PROP_KEY, new String[] { getDefHostName().getDomain() });
@@ -680,6 +683,8 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 		String[] cl_nodes = (String[]) props.get(CLUSTER_NODES_PROP_KEY);
 		int[] ports = (int[]) props.get(PORTS_PROP_KEY);
 
+		System.out.println("集群各节点端口: "+Arrays.toString(ports));
+		
 		if (ports != null) {
 			PORTS = ports;
 		}
@@ -688,17 +693,33 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 			nodesNo = cl_nodes.length;
 
 			for (String node : cl_nodes) {
+				// host是集群列表中目标主机名(可理解为域名)
 				String host = BareJID.parseJID(node)[1];
 
 				log.log(Level.CONFIG, "Found cluster node host: {0}", host);
 
+				System.out.println("-----------this remote host is: "+host);
+				System.out.println("-----------the Host is: "+getDefHostName().getDomain());
+				System.out.println("connect_all: "+connect_all);
+				
+				// 判断是否要连接到集群目标节点主机
+				// 条件分为两部分:
+				// 条件一:判断目标节点是不是本地主机
+				// 条件二:在计算hash值,如果其大于当前主机名hash值,则进行连接
+				// connect_all为表示忽略hash值比较
+				// 个人觉得使用hash比较可以减少一半连接,使得节点间只存在单向连接
+				// 例如4个节点:1-2,1-3,1-4,2-3,2-4,3-4
 				if (!host.equals(getDefHostName().getDomain())
 						&& ((host.hashCode() > getDefHostName().hashCode()) || connect_all)) {
+					
+					System.out.println("---------------ready to Connect "+host+"-----------------");
+					
 					for (int i = 0; i < per_node_conns; ++i) {
 						log.log(Level.CONFIG, "Trying to connect to cluster node: {0}", host);
 
+						// 根据集群中目标节点的配置,每个节点是一个Map在reconnectService中使用
 						Map<String, Object> port_props = new LinkedHashMap<String, Object>(12);
-
+						
 						port_props.put(SECRET_PROP_KEY, SECRET_PROP_VAL);
 						port_props.put(PORT_LOCAL_HOST_PROP_KEY, getDefHostName());
 						port_props.put(PORT_TYPE_PROP_KEY, ConnectionType.connect);
@@ -711,8 +732,12 @@ public class ClusterConnectionManager extends ConnectionManager<XMPPIOService<Ob
 					}
 
 					// reconnectService(port_props, connectionDelay);
+				} else {
+					System.out.println("---------------not connect to cluster-----------------");
 				}
 			}
+		} else {
+			System.out.println("------------------there is no cluster nodes found!--------------");
 		}
 	}
 

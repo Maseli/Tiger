@@ -48,6 +48,8 @@ import tigase.xmpp.JID;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -1023,5 +1025,15 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 				log.log(Level.WARNING, "Can't load the admin script file: " + file, e);
 			}
 		}
+	}
+	
+	public static void main(String[] args) {
+		try {
+			System.out.println(""+ InetAddress.getLocalHost().getCanonicalHostName());
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println(BareJID.bareJIDInstanceNS(DNSResolver.getDefaultHostname()));
 	}
 }

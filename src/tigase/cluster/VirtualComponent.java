@@ -208,6 +208,7 @@ public class VirtualComponent implements ServerComponent, XMPPService, Configura
 		if (params.get(CLUSTER_NODES) != null) {
 			String[] cl_nodes = ((String) params.get(CLUSTER_NODES)).split(",");
 
+			// 集群节点中有域名和默认域名相同,则设置REDIRECT_TO_PROP_KEY属性
 			for (String node : cl_nodes) {
 				if (!node.equals(DNSResolver.getDefaultHostname())) {
 					defs.put(REDIRECT_TO_PROP_KEY, BareJID.toString(getName(), node));

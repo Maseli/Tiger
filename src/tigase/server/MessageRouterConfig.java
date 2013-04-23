@@ -72,8 +72,10 @@ public class MessageRouterConfig {
 			DEF_EXT_COMP_NAME, DEF_BOSH_NAME, DEF_MONITOR_NAME, DEF_AMP_NAME };
 	private static final String[] COMP_MSG_RECEIVERS_NAMES_PROP_VAL = { DEF_COMP_PROT_NAME,
 			DEF_MONITOR_NAME, DEF_AMP_NAME };
+	/** 组件类的集合 */
 	private static final Map<String, String> COMPONENT_CLASSES = new LinkedHashMap<String,
 		String>();
+	/** 存储集群相关组件的集合 */
 	private static final Map<String, String> COMP_CLUS_MAP = new LinkedHashMap<String, String>();
 
 	/** Field description */
@@ -112,8 +114,11 @@ public class MessageRouterConfig {
 
 	//~--- static initializers --------------------------------------------------
 
+	// 各集合初始化,COMPONENT_CLASSES是单机版组件集合
+	// COMP_CLUS_MAP是集群组件集合,使用集群时需要将单机版中对应5个组件改为集群组件
 	static {
 		COMPONENT_CLASSES.put(DEF_C2S_NAME, C2S_COMP_CLASS_NAME);
+		// s2s -> tigase.server.xmppserver.S2SConnectionManager
 		COMPONENT_CLASSES.put(DEF_S2S_NAME, S2S_COMP_CLASS_NAME);
 		COMPONENT_CLASSES.put(DEF_EXT_COMP_NAME, EXT_COMP_CLASS_NAME);
 		COMPONENT_CLASSES.put(DEF_COMP_PROT_NAME, COMP_PROT_CLASS_NAME);
@@ -129,6 +134,7 @@ public class MessageRouterConfig {
 		COMPONENT_CLASSES.put(DEF_AMP_NAME, AMP_CLASS_NAME);
 		COMP_CLUS_MAP.put(SM_COMP_CLASS_NAME, SM_CLUST_COMP_CLASS_NAME);
 		COMP_CLUS_MAP.put(S2S_COMP_CLASS_NAME, S2S_CLUST_COMP_CLASS_NAME);
+		// tigase.server.xmppserver.S2SConnectionManager -> tigase.cluster.ClientConnectionClustered
 		COMP_CLUS_MAP.put(C2S_COMP_CLASS_NAME, C2S_CLUST_COMP_CLASS_NAME);
 		COMP_CLUS_MAP.put(BOSH_COMP_CLASS_NAME, BOSH_CLUST_COMP_CLASS_NAME);
 		COMP_CLUS_MAP.put(MONITOR_CLASS_NAME, MONITOR_CLUST_CLASS_NAME);
@@ -164,14 +170,20 @@ public class MessageRouterConfig {
 	 */
 	public static void getDefaults(Map<String, Object> defs, Map<String, Object> params,
 			String comp_name) {
+		// 下文所有的配置都会使用这个变量判断是否为集群模式
 		boolean cluster_mode = isTrue((String) params.get(CLUSTER_MODE));
 
 		log.config("Cluster mode: " + params.get(CLUSTER_MODE));
 
 		if (cluster_mode) {
 			log.config("Cluster mode is on, replacing known components with cluster" + " versions:");
+			// 如果是集群模式,将单机版的5个组件改为集群组件
+			// 例如单机版的s2s -> tigase.server.xmppserver.S2SConnectionManager
+			// 如果改为集群配置时,s2s -> tigase.server.xmppserver.S2SConnectionManager -> tigase.cluster.ClientConnectionClustered
+			// 相当于集群改了一些实现类
 
 			for (Map.Entry<String, String> entry : COMPONENT_CLASSES.entrySet()) {
+				
 				String cls = COMP_CLUS_MAP.get(entry.getValue());
 
 				if (cls != null) {

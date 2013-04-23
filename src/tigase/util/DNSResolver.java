@@ -88,8 +88,11 @@ public class DNSResolver {
 		ip_cache.put(LOCALHOST, new DNSEntry(LOCALHOST, "127.0.0.1"));
 
 		try {
+			// edit by LQ:原用法在win下可以获取hostname,部署在Linux时会获取联通DNS错误页面地址
+//			String newHostName =
+//					InetAddress.getLocalHost().getCanonicalHostName().toLowerCase();
 			String newHostName =
-					InetAddress.getLocalHost().getCanonicalHostName().toLowerCase();
+					InetAddress.getLocalHost().getHostName().toLowerCase();
 			if (!LOCALHOST.equals(newHostName)) {
 				localnames = new String[2];
 				localnames[0] = newHostName;
@@ -112,7 +115,9 @@ public class DNSResolver {
 						continue;
 					}
 
-					defaultHostname = addr.getCanonicalHostName().toLowerCase();
+					// edit by LQ:原用法在win下可以获取hostname,部署在Linux时会获取联通DNS错误页面地址
+					//defaultHostname = addr.getCanonicalHostName().toLowerCase();
+					defaultHostname = addr.getHostName().toLowerCase();
 				}
 			}
 

@@ -289,6 +289,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 			props.put(PORTS_PROP_KEY, ports);
 		} else {
+			// 如果没有在配置文件中指定端口,就按照各实现类的getDefPlainPorts方法返回设置
 			int[] plains = getDefPlainPorts();
 
 			if (plains != null) {
@@ -976,6 +977,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 				new Object[] { getName(), delay / 1000, cid });
 		}
 
+		// 添加定时器,2秒后执行启动根据传入配置开启连接
 		addTimerTask(new TimerTask() {
 				@Override
 				public void run() {
