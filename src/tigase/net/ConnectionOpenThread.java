@@ -73,7 +73,8 @@ public class ConnectionOpenThread implements Runnable {
 	/** Field description */
 	public static final long def_5269_throttling = 100;
 
-	/** Field description */
+	/** 管理各端口当前秒的连接数值,和该端口的每秒连接阈值.
+	 * 上述信息存储在PortThrottlingData实例中,这个变量指向存储PortThrottlingData实例的Map */
 	public static Map<Integer, PortThrottlingData> throttling = new ConcurrentHashMap<Integer,
 		PortThrottlingData>(10);
 
@@ -94,6 +95,7 @@ public class ConnectionOpenThread implements Runnable {
 	 *
 	 */
 	private ConnectionOpenThread() {
+		// 该类为单例,所以构造器的内容会随着单例init时执行
 		timer = new Timer("Connections open timer", true);
 		// 定时器,每1秒将所有端口的连接计数数值清0.
 		// PS:这个数值一旦超出阈值,则不会处理该端口的新请求.
@@ -107,6 +109,7 @@ public class ConnectionOpenThread implements Runnable {
 		}, 1000, 1000);
 
 		try {
+			// 这是nio通信机制的根源,获取作为server的唯一的selector
 			selector = Selector.open();
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Server I/O error, can't continue my work.", e);
@@ -117,7 +120,7 @@ public class ConnectionOpenThread implements Runnable {
 	//~--- get methods ----------------------------------------------------------
 
 	/**
-	 * Method description
+	 * 获取一个ConnectionOpenThread实例
 	 *
 	 *
 	 * @return
@@ -160,7 +163,7 @@ public class ConnectionOpenThread implements Runnable {
 	}
 
 	/**
-	 * Method description
+	 * 根据attach到channel的ConnectionOpenListener实例注销SelectionKey
 	 *
 	 *
 	 * @param al
@@ -191,8 +194,8 @@ public class ConnectionOpenThread implements Runnable {
 	public void run() {
 		while ( !stopping) {
 			try {
-				// 获取当前可以处理的keys,也就是准备好了的Channel(通过SelectionKey的channel方法)
-				selector.select();
+				// 获取当前可以处理的keys,也就是准备好了的Channel
+				selector.select(); // may blocking
 
 				Set<SelectionKey> keys = selector.selectedKeys();
 				
@@ -216,7 +219,7 @@ public class ConnectionOpenThread implements Runnable {
 							log.finest("OP_ACCEPT");
 						}
 						
-						// 每个端口都有连接的数量限制,获取该端口的阈值
+						// 每个端口都有每秒内连接的数量限制,获取该端口的阈值和连接情况
 						PortThrottlingData port_throttling = throttling.get(nextReady.socket().getLocalPort());
 
 						if (port_throttling != null) {
@@ -363,7 +366,7 @@ public class ConnectionOpenThread implements Runnable {
 				break;
 
 			case connect :
-				System.out.println("ConnectionOpenThread:360 addTask connect to Host："+isa.getAddress()+":"+isa.getPort());
+				System.out.println("ConnectionOpenThread:360 addTask connect to Host: "+isa.getAddress()+":"+isa.getPort());
 				
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "Setting up ''connect'' channel for: {0}/{1}",
@@ -461,12 +464,16 @@ public class ConnectionOpenThread implements Runnable {
 
 	//~--- inner classes --------------------------------------------------------
 
+	/** 
+	 * 每个端口的单位时间接收连接次数实体类,目前使用定时器每秒清0一次
+	 * 
+	 */
 	private class PortThrottlingData {
 
-		/** Field description */
+		/** 这一秒内的连接次数,这个数值会不断增加,每秒由定时器清0一次 */
 		protected long lastSecondConnections = 0;
 
-		/** Field description */
+		/** 该端口的每秒连接阈值,这个数值在注册ACCEPT的KEY到Selector时指定 */
 		protected long throttling;
 
 		//~--- constructors -------------------------------------------------------

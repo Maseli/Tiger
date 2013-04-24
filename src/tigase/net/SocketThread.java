@@ -141,6 +141,7 @@ public class SocketThread implements Runnable {
 
 	/**
 	 * Creates a new <code>SocketThread</code> instance.
+	 * 构造器私有,所有实例化都只在这个类中使用
 	 *
 	 */
 	private SocketThread(String name) {
@@ -188,9 +189,9 @@ public class SocketThread implements Runnable {
 		// dead-lock. Let's make sure the service is always processed
 		// by the same thread thus the same Selector.
 		// socketReadThread[incrementAndGet()].addSocketServicePriv(s);
-                if (s.waitingToRead()) {
-                        socketReadThread[s.hashCode() % socketReadThread.length].addSocketServicePriv(s);
-                }
+        if (s.waitingToRead()) {
+            socketReadThread[s.hashCode() % socketReadThread.length].addSocketServicePriv(s);
+        }
 
 		if (s.waitingToSend()) {
 			socketWriteThread[s.hashCode() % socketWriteThread.length].addSocketServicePriv(s);

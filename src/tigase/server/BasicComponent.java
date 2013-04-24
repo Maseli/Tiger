@@ -852,6 +852,7 @@ public class BasicComponent implements Configurable, XMPPService, VHostListener 
 		// TODO: test if commands still work for users from different XMPP servers
 		// with the right permission set.
 		if (pc.getPermissions() == Permissions.NONE) {
+			// 没有执行权限
 			return false;
 		}
 

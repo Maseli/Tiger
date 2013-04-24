@@ -62,6 +62,9 @@ public class WebAPI extends AbstractHandler
         getInfoHandler.setContextPath("/gi");
         getInfoHandler.setHandler(new WebAPI("/getInfo"));
         
+        // 注意:这里所有的handler都没有修改maxFormContentSize参数
+        // 这个参数限制了表单数据量的上线,如果参数的值超过200KB就会报错
+
         ContextHandlerCollection handlers = new ContextHandlerCollection();
         handlers.setHandlers(new Handler[]{sendNotifyHandler, getInfoHandler});
         server.setHandler(handlers);

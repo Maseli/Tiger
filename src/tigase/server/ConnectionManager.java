@@ -123,7 +123,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	/** Field description. */
 	public static final String PORT_LOCAL_HOST_PROP_KEY = "local-host";
 	/* ConnectionOpenThread的实例,5222等端口连接所对应的Selector持有类
-	 	SelectionKey的处理类,貌似是单例 */
+	 	SelectionKey的处理类,只在clinit时执行,个人认为是单例 */
 	private static ConnectionOpenThread connectThread = ConnectionOpenThread.getInstance();
 
 	/**

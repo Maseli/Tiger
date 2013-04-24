@@ -1100,11 +1100,18 @@ public abstract class AbstractMessageReceiver extends BasicComponent implements
 		return def;
 	}
 
+	/**
+	 * 如果各过滤器都没问题,返回传入参数的packet
+	 * @param packet
+	 * @param filters
+	 * @return
+	 */
 	private Packet
 			filterPacket(Packet packet, CopyOnWriteArrayList<PacketFilterIfc> filters) {
 		Packet result = packet;
 
 		for (PacketFilterIfc packetFilterIfc : filters) {
+			// 只要Flter不block就会原样返回参数packet
 			result = packetFilterIfc.filter(result);
 
 			if (result == null) {
@@ -1115,6 +1122,12 @@ public abstract class AbstractMessageReceiver extends BasicComponent implements
 		return result;
 	}
 
+	/**
+	 * 实例化in/out两组QueueListener线程
+	 * 线程个数与实现类有关
+	 * 启动这些线程
+	 * 
+	 */
 	private void startThreads() {
 		if (threadsQueue == null) {
 			threadsQueue = new ArrayDeque<QueueListener>(8);
@@ -1318,11 +1331,14 @@ public abstract class AbstractMessageReceiver extends BasicComponent implements
 								// Maybe this is a command for local processing...
 								boolean processed = false;
 
+								// 如果packet是一个命令,执行命令并返回结果
 								if (packet.isCommand() && (packet.getStanzaTo() != null)
 										&& compName.equals(packet.getStanzaTo().getLocalpart())
 										&& isLocalDomain(packet.getStanzaTo().getDomain())) {
+									// 执行命令,将结果写入results中
 									processed = processScriptCommand(packet, results);
 
+									// 如果执行成功,返回结果
 									if (processed) {
 										Packet result = null;
 
@@ -1331,7 +1347,8 @@ public abstract class AbstractMessageReceiver extends BasicComponent implements
 										}
 									}
 								}
-
+								
+								// 如果不是命令,或者命令处理失败就当成普通packet处理
 								if (!processed
 										&& ((packet = filterPacket(packet, incoming_filters)) != null)) {
 									processPacket(packet);
