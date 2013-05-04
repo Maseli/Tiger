@@ -113,7 +113,7 @@ public class SessionManagerClustered extends SessionManager implements
 	/** Field description */
 	public static final String STRATEGY_CLASS_PROP_KEY = "sm-cluster-strategy-class";
 
-	/** Field description */
+	/** STRATEGY_CLASS_PROP_KEY的默认值 */
 	public static final String STRATEGY_CLASS_PROP_VAL =
 			"tigase.cluster.strategy.SMNonCachingAllNodes";
 
@@ -209,11 +209,13 @@ public class SessionManagerClustered extends SessionManager implements
 	public Map<String, Object> getDefaults(Map<String, Object> params) {
 		Map<String, Object> props = super.getDefaults(params);
 		String strategy_class = (String) params.get(STRATEGY_CLASS_PROPERTY);
-
+		// 如果配置中没有--sm-cluster-strategy-class,将该属性设置为默认值
 		if (strategy_class == null) {
+			// 默认值是tigase.cluster.strategy.SMNonCachingAllNodes
 			strategy_class = STRATEGY_CLASS_PROP_VAL;
 		}
-
+		
+		// 设置集群策略
 		props.put(STRATEGY_CLASS_PROP_KEY, strategy_class);
 
 		try {
@@ -236,6 +238,7 @@ public class SessionManagerClustered extends SessionManager implements
 		}
 
 		// defs.put(LOCAL_DOMAINS_PROP_KEY, LOCAL_DOMAINS_PROP_VAL);
+		// 由于重构了DNSResolver.getDefHostNames()方法,所以这个key存储了机器名
 		props.put(MY_DOMAIN_NAME_PROP_KEY, local_domains[0]);
 
 		if (params.get(CLUSTER_NODES) != null) {
@@ -510,7 +513,9 @@ public class SessionManagerClustered extends SessionManager implements
 			// cmdTm = System.currentTimeMillis() - startTime;
 
 		} else {
-
+			// 如果不是命令
+			
+			// 获取这个消息packet对应的XMPP连接
 			XMPPResourceConnection conn = getXMPPResourceConnection(packet);
 
 			List<JID> toNodes =
@@ -662,9 +667,11 @@ public class SessionManagerClustered extends SessionManager implements
 			String strategy_class = (String) props.get(STRATEGY_CLASS_PROP_KEY);
 
 			try {
+				// strategy默认是tigase.cluster.strategy.SMNonCachingAllNodes
 				ClusteringStrategyIfc strategy_tmp =
 						(ClusteringStrategyIfc) Class.forName(strategy_class).newInstance();
-
+				// 话说ClusteringStrategyIfc的实现类默认只有一个
+				// 就是之前提到的tigase.cluster.strategy.SMNonCachingAllNodes
 				strategy_tmp.setProperties(props);
 
 				// strategy_tmp.init(getName());

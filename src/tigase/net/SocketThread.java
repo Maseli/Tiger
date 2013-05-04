@@ -64,7 +64,9 @@ public class SocketThread implements Runnable {
 	/** 每个CPU最多运行8个线程 */
 	public static final int DEF_MAX_THREADS_PER_CPU = 8;
 	private static final int MAX_EMPTY_SELECTIONS = 10;
+	/** 读线程集合 */ 
 	private static SocketThread[] socketReadThread = null;
+	/** 写线程集合 */
 	private static SocketThread[] socketWriteThread = null;
 	private static int cpus = Runtime.getRuntime().availableProcessors();
 	private static ThreadPoolExecutor executor = null;
@@ -177,7 +179,8 @@ public class SocketThread implements Runnable {
 //}
 
 	/**
-	 * Method description
+	 * 添加新的IOService到线程,不直接找到具体线程
+	 * 而是使用static方法,由hash值决定线程集合中的哪个线程处理
 	 *
 	 *
 	 * @param s
@@ -221,8 +224,8 @@ public class SocketThread implements Runnable {
 	}
 
 	/**
-	 * Method description
-	 *
+	 * 单个线程添加IOService的方法
+	 * 实例方法
 	 *
 	 * @param s
 	 */
@@ -259,17 +262,27 @@ public class SocketThread implements Runnable {
 				Set<SelectionKey> selected = clientsSel.selectedKeys();
 				int selectedKeys = selected.size();
 
+				// 没有事件需要去处理,队列中也没有等待的任务
+				// selector偶尔会返回0,恰巧这时没有任务......
 				if ((selectedKeys == 0) && (waiting.size() == 0)) {
 					if (log.isLoggable(Level.FINEST)) {
 						log.finest("Selected keys = 0!!! a bug again?");
 					}
 
+					// 貌似是针对JDK1.6u4之前的bug,有几率出现频繁select回0但是无Key需处理
+					// 这样持续下去CPU会达到100%,所以要设置阈值及时重建selector
+					// 就是在while无阻塞死循环的时候拦住
 					if ((++empty_selections) > MAX_EMPTY_SELECTIONS) {
+						// 经常出现空消息,而且队列也没有任务就重建selector
 						recreateSelector();
 					}
 				} else {
+					// 清除连续错误的计数
 					empty_selections = 0;
 
+					// 如果selector无端的返回了0,但是waiting队列却有值
+					// 那么这段可以忽略,因为addWaiting()才是王道
+					// 话说没bug的话,能错过了这个if的情况应该都是调用wakeup造成的
 					if (selectedKeys > 0) {
 
 						// This is dirty but selectNow() causes concurrent modification exception
@@ -334,7 +347,9 @@ public class SocketThread implements Runnable {
 					}
 
 					// Clean-up cancelled keys...
-					clientsSel.selectNow();
+					clientsSel.selectNow(); // 据说与wakeup方法呼应,同时可以清除canceled keys以防止1.6u4之前的bug出现
+					// 在这次while执行过程中,如果有线程执行了wakeup,这个selectNow可以将其清除,因为马上就要执行addAllWaiting方法了
+					// addAllWaiting方法会将所有的等待任务都注册到selector的,所以要防止wakeup干扰下次程序正常阻塞
 				}
 
 				addAllWaiting();
@@ -415,6 +430,11 @@ public class SocketThread implements Runnable {
 
 	//~--- methods --------------------------------------------------------------
 
+	/**
+	 * 将waiting队列的
+	 * 
+	 * @throws IOException
+	 */
 	private void addAllWaiting() throws IOException {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "waiting.size(): {0}", waiting.size());
@@ -428,6 +448,7 @@ public class SocketThread implements Runnable {
 
 			try {
 				if (sc.isConnected()) {
+					// 每个SocketThread都在实例化的时候写明了是读线程还是写线程
 					if (reading) {
 						sc.register(clientsSel, SelectionKey.OP_READ, s);
 
@@ -483,6 +504,10 @@ public class SocketThread implements Runnable {
 	}
 
 	// Implementation of java.lang.Runnable
+	/**
+	 * 在判断出selector出现问题,利用此方法重建selector
+	 * @throws IOException
+	 */
 	private synchronized void recreateSelector() throws IOException {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Recreating selector, opened channels: {0}", clientsSel.keys().size());
@@ -520,6 +545,7 @@ public class SocketThread implements Runnable {
 			// waiting.offer(serv);
 		}
 
+		// 个人认为这个是为了防止jdk6u4之前的bug设置
 		if (cancelled) {
 			clientsSel.selectNow();
 		} else {

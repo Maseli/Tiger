@@ -616,7 +616,7 @@ public class Packet {
 	 * Returns the packet internal source address.
 	 *
 	 *
-	 * @return a <code>JID>/code> instance of the packet internal source address or
+	 * @return a <code>JID</code> instance of the packet internal source address or
 	 * NULL if the packet internal source address has not been set
 	 */
 	public JID getPacketFrom() {

@@ -1088,10 +1088,21 @@ public abstract class AbstractMessageReceiver extends BasicComponent implements
 		return true;
 	}
 
+	/**
+	 * 添加定时器
+	 * @param task
+	 * @param delay
+	 * @param unit
+	 */
 	protected void addTimerTask(TimerTask task, long delay, TimeUnit unit) {
 		receiverTasks.schedule(task, unit.toMillis(delay));
 	}
 
+	/**
+	 * 添加定时器
+	 * @param task
+	 * @param delay
+	 */
 	protected void addTimerTask(TimerTask task, long delay) {
 		receiverTasks.schedule(task, delay);
 	}
@@ -1297,7 +1308,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent implements
 
 			while (!threadStopped) {
 				try {
-
+					System.out.println("......................try:1311"+" name:"+getName());
 					// Now process next waiting packet
 					// log.finest("[" + getName() + "] before take... " + type);
 					// packet = queue.take(getName() + ":" + type);
@@ -1310,6 +1321,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent implements
 					// }
 					switch (type) {
 						case IN_QUEUE:
+							System.out.println("......................try:1324"+"IN_QUEUE"+" name:"+getName());
 							long startPPT = System.currentTimeMillis();
 
 							// tracer.trace(null, packet.getElemTo(), packet.getElemFrom(),
@@ -1317,15 +1329,19 @@ public abstract class AbstractMessageReceiver extends BasicComponent implements
 							PacketReceiverTask task = null;
 
 							if (packet.getTo() != null) {
+								System.out.println("......................try:1332"+"packet.getTo() != null"+" name:"+getName());
+
 								String id = packet.getTo().toString() + packet.getStanzaId();
 
 								task = waitingTasks.remove(id);
 							}
 
 							if (task != null) {
+								System.out.println("......................try:1340"+"task != null"+" name:"+getName());
 								task.handleResponse(packet);
+								log.info("................存在接收任务,准备处理packet："+packet.toString()+" name:"+getName());
 							} else {
-
+								System.out.println("......................try:1344"+"task == null"+" name:"+getName());
 								// log.finest("[" + getName() + "]  " +
 								// "No task found for id: " + id);
 								// Maybe this is a command for local processing...
@@ -1335,6 +1351,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent implements
 								if (packet.isCommand() && (packet.getStanzaTo() != null)
 										&& compName.equals(packet.getStanzaTo().getLocalpart())
 										&& isLocalDomain(packet.getStanzaTo().getDomain())) {
+									System.out.println("......................try:1354"+"packet.isCommand()"+" name:"+getName());
 									// 执行命令,将结果写入results中
 									processed = processScriptCommand(packet, results);
 
@@ -1351,6 +1368,7 @@ public abstract class AbstractMessageReceiver extends BasicComponent implements
 								// 如果不是命令,或者命令处理失败就当成普通packet处理
 								if (!processed
 										&& ((packet = filterPacket(packet, incoming_filters)) != null)) {
+									System.out.println("......................try:1371"+"processed==false"+" name:"+getName());
 									processPacket(packet);
 								}
 
@@ -1367,10 +1385,11 @@ public abstract class AbstractMessageReceiver extends BasicComponent implements
 							break;
 
 						case OUT_QUEUE:
-
+							System.out.println("......................try:1386"+" OUT_QUEUE"+" name:"+getName());
 							// tracer.trace(null, packet.getElemTo(), packet.getElemFrom(),
 							// packet.getTo(), getName(), type.name(), null, packet);
 							if ((packet = filterPacket(packet, outgoing_filters)) != null) {
+								System.out.println("......................准备发送消息: "+packet.toString()+" name:"+getName());
 								processOutPacket(packet);
 							}
 

@@ -191,8 +191,8 @@ public class SMNonCachingAllNodes implements ClusteringStrategyIfc {
 	}
 
 	/**
-	 * Method description
-	 * 
+	 * 根据配置初始化该策略
+	 * 默认实现为空
 	 * 
 	 * @param props
 	 */

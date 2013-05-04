@@ -717,6 +717,7 @@ public class MessageRouter extends AbstractMessageReceiver implements MessageRou
 			//
 			// tmp_rec.clear();
 			if ((Boolean) props.get(UPDATES_CHECKING_PROP_KEY)) {
+				// 如果开启了检查更新,Tigase会按照默认周期(7天)去服务器检查更新
 				installUpdatesChecker((Long) props.get(UPDATES_CHECKING_INTERVAL_PROP_KEY));
 			} else {
 				log.log(Level.INFO, "Disabling updates checker.");

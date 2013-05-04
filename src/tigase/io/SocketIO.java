@@ -240,10 +240,10 @@ public class SocketIO implements IOInterface {
 	// ~--- methods --------------------------------------------------------------
 
 	/**
-	 * Method description
+	 * 将SocketChannel中的数据读到buff中
 	 * 
 	 * 
-	 * @param buff
+	 * @param buff 一个空的用来装数据的Buffer
 	 * 
 	 * @return
 	 * 

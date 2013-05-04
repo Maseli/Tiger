@@ -122,7 +122,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 	/** Field description. */
 	public static final String PORT_LOCAL_HOST_PROP_KEY = "local-host";
-	/* ConnectionOpenThread的实例,5222等端口连接所对应的Selector持有类
+	/** ConnectionOpenThread的实例,5222等端口连接所对应的Selector持有类
 	 	SelectionKey的处理类,只在clinit时执行,个人认为是单例 */
 	private static ConnectionOpenThread connectThread = ConnectionOpenThread.getInstance();
 
@@ -559,8 +559,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		String id = getUniqueId(service);
 
 		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.FINER, "[[{0}]] Connection started: {1}", new Object[] { getName(),
-																																						 service });
+			log.log(Level.FINER, "[[{0}]] Connection started: {1}", new Object[] { getName(),service });
 		}
 
 		IO serv = services.get(id);
@@ -610,8 +609,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		String id = getUniqueId(service);
 
 		if (log.isLoggable(Level.FINER)) {
-			log.log(Level.FINER, "[[{0}]] Connection stopped: {1}", new Object[] { getName(),
-																																						 service });
+			log.log(Level.FINER, "[[{0}]] Connection stopped: {1}", new Object[] { getName(), service });
 		}
 
 		// id might be null if service is stopped in accept method due to
@@ -996,6 +994,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 							new Object[] { getName(), host, port });
 					}
 
+					// 开启端口连接的服务
 					startService(port_props);
 				}
 			}, delay);
@@ -1009,6 +1008,10 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		pending_open.clear();
 	}
 
+	/**
+	 * 根据配置开启端口连接服务,通过将listener加入队列实现
+	 * @param port_props
+	 */
 	private void startService(Map<String, Object> port_props) {
 		if (port_props == null) {
 			throw new NullPointerException("port_props cannot be null.");
@@ -1022,7 +1025,10 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		connectThread.addConnectionOpenListener(cli);
 	}
 
-	// ConnectionOpenListener类的实现,作为Channel的attachment
+	/** 
+	 * ConnectionOpenListener类的实现,作为Channel的attachment
+	 * 
+	 */
 	private class ConnectionListenerImpl implements ConnectionOpenListener {
 		private Map<String, Object> port_props = null;
 
@@ -1047,12 +1053,14 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 			IO serv = getXMPPIOServiceInstance();
 
+			// 将内部类所属的类的实例作为参数
 			serv.setIOServiceListener(ConnectionManager.this);
 			serv.setSessionData(port_props);
 
 			try {
 				serv.accept(sc);
 
+				// 如果使用SSL连接
 				if (getSocketType() == SocketType.ssl) {
 					serv.startSSL(false);
 				} // end of if (socket == SocketType.ssl)
@@ -1217,7 +1225,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	/**
 	 * Looks in all established connections and checks whether any of them is
 	 * dead....
-	 *
+	 * 看门狗
 	 */
 	private class Watchdog implements Runnable {
 
@@ -1247,6 +1255,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 										long curr_time = System.currentTimeMillis();
 										long lastTransfer = service.getLastTransferTime();
 
+										// maxInactivityTime是从实现类中取的
 										if (curr_time - lastTransfer >= maxInactivityTime) {
 
 											// Stop the service is max keep-alive time is exceeded
@@ -1260,6 +1269,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 											++watchdogStopped;
 											service.stop();
 										} else {
+											// 为保证至少每小时检查一次,如果时间间隔超过29分钟就发送一次space以测试
 											if (curr_time - lastTransfer >= (29 * MINUTE)) {
 
 												// At least once an hour check if the connection is

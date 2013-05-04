@@ -103,13 +103,13 @@ public class MessageRouterConfig {
 	/** Field description */
 	public static final String UPDATES_CHECKING_PROP_KEY = "updates-checking";
 
-	/** Field description */
-	public static final Boolean UPDATES_CHECKING_PROP_VAL = true;
+	/** 默认的是否检查更新选项,原值为true,由于重构Tigase为Tiger,故将该值改为false */
+	public static final Boolean UPDATES_CHECKING_PROP_VAL = false;
 
-	/** Field description */
+	/** 检查Tigase更新周期 */
 	public static final String UPDATES_CHECKING_INTERVAL_PROP_KEY = "updates-checking-interval";
 
-	/** Field description */
+	/** 检查Tigase更新默认周期为7天 */
 	public static final long UPDATES_CHECKING_INTERVAL_PROP_VAL = 7;
 
 	//~--- static initializers --------------------------------------------------
@@ -303,6 +303,7 @@ public class MessageRouterConfig {
 		defs.put(LOCAL_ADDRESSES_PROP_KEY, LOCAL_ADDRESSES_PROP_VALUE);
 		defs.put(DISCO_NAME_PROP_KEY, DISCO_NAME_PROP_VAL);
 		defs.put(DISCO_SHOW_VERSION_PROP_KEY, DISCO_SHOW_VERSION_PROP_VAL);
+		// 设置关于Tigase检查更新的两个默认值,修改后Tiger程序默认不检查更新
 		defs.put(UPDATES_CHECKING_PROP_KEY, UPDATES_CHECKING_PROP_VAL);
 		defs.put(UPDATES_CHECKING_INTERVAL_PROP_KEY, UPDATES_CHECKING_INTERVAL_PROP_VAL);
 	}

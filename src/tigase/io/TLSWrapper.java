@@ -77,7 +77,7 @@ public class TLSWrapper {
 
 	/**
 	 * Creates a new <code>TLSWrapper</code> instance.
-	 *
+	 * 安全传输层协议 TLS：TransportLayerSecurity
 	 *
 	 * @param sslc
 	 * @param eventHandler

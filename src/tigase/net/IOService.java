@@ -546,7 +546,7 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>,
 	// ~--- methods --------------------------------------------------------------
 
 	/**
-	 * Method description
+	 * 开启SSL连接
 	 * 
 	 * 
 	 * @param clientMode
@@ -561,7 +561,8 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>,
 		TLSWrapper wrapper =
 				new TLSWrapper(TLSUtil.getSSLContext("SSL",
 						(String) sessionData.get(HOSTNAME_KEY)), this, clientMode);
-
+		
+		// 获得TLS包装了的socketIO实例
 		socketIO = new TLSIO(socketIO, wrapper);
 		setLastTransferTime();
 		encoder.reset();
@@ -757,6 +758,7 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>,
 
 			// resizeInputBuffer();
 			// Maybe we can shrink the input buffer??
+			// socketInputSize缺省为2048
 			if ((socketInput.capacity() > socketInputSize)
 					&& (socketInput.remaining() == socketInput.capacity())) {
 
@@ -1030,6 +1032,7 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>,
 				// idx_start = idx_offset;
 				// idx_offset = Math.min(idx_start + out_buff_size, data.length());
 				// }
+				// 设置最后数据传输时间
 				setLastTransferTime();
 
 				// addWritten(data.length());
@@ -1159,6 +1162,9 @@ public abstract class IOService<RefObject> implements Callable<IOService<?>>,
 
 	// ~--- set methods ----------------------------------------------------------
 
+	/**
+	 * 设置最后数据传输时间
+	 */
 	private void setLastTransferTime() {
 		lastTransferTime = System.currentTimeMillis();
 	}

@@ -150,6 +150,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 
 	/**
 	 * A Map with bare user JID as a key and a user session object as a value.
+	 * 这个Map会存储所有的JID和它们对应的session
 	 */
 	private ConcurrentHashMap<BareJID, XMPPSession> sessionsByNodeId =
 			new ConcurrentHashMap<BareJID, XMPPSession>(100000);
@@ -170,6 +171,7 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 	/**
 	 * A Map with connectionID as a key and an object with all the user connection
 	 * data as a value
+	 * 看起来这个Map会存储所有的连接JID及它们的XMPP连接
 	 */
 	protected ConcurrentHashMap<JID, XMPPResourceConnection> connectionsByFrom =
 			new ConcurrentHashMap<JID, XMPPResourceConnection>(100000);
@@ -325,14 +327,14 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 	}
 
 	/**
-	 * Method description
 	 * 
 	 * 
-	 * @param jid
+	 * @param jid 是packet中的stanzaTo
 	 * 
 	 * @return
 	 */
 	public XMPPResourceConnection getResourceConnection(JID jid) {
+		// 获取这个jid对应的session
 		XMPPSession session = getSession(jid.getBareJID());
 
 		if (session != null) {
@@ -340,10 +342,12 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 				log.log(Level.FINEST, "Session not null, getting resource for jid: {0}", jid);
 			}
 
+			// 如果session存在,就从session取对应连接
 			return session.getResourceConnection(jid);
 		} // end of if (session != null)
 
 		// Maybe this is a call for the server session?
+		// 可能这个调用是来自本地server session的,这个可以通过对域名的判断得知
 		if (isLocalDomain(jid.toString(), false)) {
 			return smResourceConnection;
 		}
@@ -1023,7 +1027,13 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 		return def * 10;
 	}
 
+	/**
+	 * 根据JID获取对应的XMPPSession,这些信息存储在一个Map里
+	 * @param jid
+	 * @return
+	 */
 	protected XMPPSession getSession(BareJID jid) {
+		// 从Map集合中获取该JID对应的session
 		return sessionsByNodeId.get(jid);
 	}
 
@@ -1031,6 +1041,11 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 		return connectionsByFrom.get(connId);
 	}
 
+	/**
+	 * 根据消息packet获取消息对应的XMPP连接
+	 * @param p 消息对应的packet实例
+	 * @return
+	 */
 	protected XMPPResourceConnection getXMPPResourceConnection(Packet p) {
 		XMPPResourceConnection conn = null;
 		JID from = p.getPacketFrom();
@@ -1042,7 +1057,8 @@ public class SessionManager extends AbstractMessageReceiver implements Configura
 				return conn;
 			}
 		}
-
+		
+		// 貌似是message的话没有from
 		// It might be a message _to_ some user on this server
 		// so let's look for established session for this user...
 		JID to = p.getStanzaTo();

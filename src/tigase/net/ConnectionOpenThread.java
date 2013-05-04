@@ -152,8 +152,7 @@ public class ConnectionOpenThread implements Runnable {
 	//~--- methods --------------------------------------------------------------
 
 	/**
-	 * Method description
-	 *
+	 * 将连接监听器添加到处理队列中
 	 *
 	 * @param al
 	 */
@@ -323,6 +322,10 @@ public class ConnectionOpenThread implements Runnable {
 		selector.wakeup();
 	}
 
+	/**
+	 * 将waiting队列中等待的连接注册到Selector
+	 * @throws IOException
+	 */
 	private void addAllWaiting() throws IOException {
 		ConnectionOpenListener al = null;
 
@@ -335,8 +338,15 @@ public class ConnectionOpenThread implements Runnable {
 		}      // end of for ()
 	}
 
+	/**
+	 * 根据连接监听器创建连接,并注册到Selector.
+	 * @param isa 要bind/connect的IP地址
+	 * @param al 要添加的连接的监听器,也就是attachment
+	 * @throws IOException
+	 */
 	private void addISA(InetSocketAddress isa, ConnectionOpenListener al) throws IOException {
 		System.out.println("addISA is running..................");
+		// 根据监听器的配置是server还是client
 		switch (al.getConnectionType()) {
 			case accept :
 				long port_throttling = getThrottlingForPort(isa.getPort());

@@ -49,14 +49,15 @@ public class TestWebAPIService extends Thread {
 		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
 
 		try {
-			nameValuePairs.add(new BasicNameValuePair("receiver", "ceshi"));
-			nameValuePairs.add(new BasicNameValuePair("notify", "{\"test\":\"测试\",\"ceshi\":\"zhi\"}"));
+			nameValuePairs.add(new BasicNameValuePair("receiver", "yamma100"));
+			nameValuePairs.add(new BasicNameValuePair("notify", "{\"content\":{\"ntype\":2,\"senderId\":\"yamma1" +
+					"\",\"mid\":\"0\",\"msg\":\"测试&amp;\"},\"receiverId\":\"yamma1\"}"));
 			
 			httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs,"utf-8"));
 			HttpResponse response = httpclient.execute(httppost);
 
 			InputStream is = response.getEntity().getContent(); 
-			BufferedInputStream bis = new BufferedInputStream(is); 
+			BufferedInputStream bis = new BufferedInputStream(is);
 			ByteArrayBuffer baf = new ByteArrayBuffer(20);
 			
 			int current = 0;
